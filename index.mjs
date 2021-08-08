@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import * as secret from './secrets.json'
 
 const errorPage = `
 <!DOCTYPE html>
