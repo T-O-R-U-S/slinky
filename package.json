@@ -1,0 +1,14 @@
+{
+  "name": "slinky",
+  "version": "1.0.0",
+  "main": "index.mjs",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@koa/router": "^10.1.0",
+    "koa": "^2.13.1",
+    "koa-body": "^4.2.0",
+    "koa-static": "^5.0.0",
+    "mongoose": "^5.13.5"
+  }
+}
