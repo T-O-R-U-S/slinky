@@ -36,7 +36,7 @@ const errorPage = `
 `
 
 mongoose.connect(
-	`mongodb+srv://slinky:${process.env.PASS || secret.default.pass}@cluster0.auiw8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true}
+	`mongodb+srv://slinky:${process.env.PASS}@cluster0.auiw8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true}
 );
 
 const linkSchema = mongoose.Schema({
