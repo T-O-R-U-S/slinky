@@ -72,7 +72,40 @@ router.post('/', body(), async (ctx, next) => {
 	newLink.save();
 
 	ctx.response.status = 200;
-	ctx.response.message = `Your link ID is ${newLink._id}`;
+	ctx.response.body = `
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Slinky</title>
+		<style>
+			body {
+				margin: 0;
+			}
+			div {
+				background-color: pink;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 75vh;
+				width: 100%;
+				flex-direction: column;
+			}
+			input {
+				width: 10vw;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<h1>Your shortened link ID is:</h1>
+			<h2><a href="/short/${newLink._id}">${newLink._id}</a></h2>
+		</div>
+	</body>
+	</html>
+	`;
 	next()
 });
 
