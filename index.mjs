@@ -52,7 +52,7 @@ router.post('/', body(), async (ctx, next) => {
 	// Change response status
 	ctx.response.status = 200;
 
-	// Not very clean, but saves me some additional work.
+	// Not the cleanest. I should review this later.
 	// Serves response page with the shortened link ID
 	ctx.response.body = `
 	<!DOCTYPE html>
@@ -92,7 +92,13 @@ router.post('/', body(), async (ctx, next) => {
 });
 
 // Error page. If any function fails, you will be directed here.
-router.get("/error", serve("."))
+router.get(
+	"/error", 
+	// Due to a quirk of koa-route, it automatically 
+	// assumes that I'm in the error directory, so I serve
+	// "." which gives the current working directory instead
+	serve(".")
+)
 
 router.get("/visits/:id", async (ctx, next) => {
 	try {
@@ -108,6 +114,7 @@ router.get("/visits/:id", async (ctx, next) => {
 
 router.get("/short/:id", async (ctx, next) => {
 	try {
+		// Find user's link
 		let link = await Link.findById(ctx.params.id);
 
 		// Update visit count
@@ -122,6 +129,7 @@ router.get("/short/:id", async (ctx, next) => {
 	} catch(err) {
 		console.log(err)
 		
+		// Redirect user to error page
 		ctx.response.redirect("/error")
 	}
 	next()
