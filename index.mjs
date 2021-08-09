@@ -1,79 +1,59 @@
+
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-const errorPage = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Slinky</title>
-	<style>
-		body {
-			margin: 0;
-		}
-		div {
-			background-color: pink;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 75vh;
-			width: 100%;
-			flex-direction: column;
-		}
-		input {
-			width: 10vw;
-		}
-	</style>
-</head>
-<body>
-	<div>
-		<h1>There was an error in your request</h1>
-		<h3>Maybe your shortener ID is wrong, or the provided link was invalid.</h3>
-	</div>
-</body>
-</html>
-`
-
+// Connects mongoose to DB.
 mongoose.connect(
+	// Forgot to rename DB, kekw
 	`mongodb+srv://slinky:${process.env.PASS}@cluster0.auiw8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`, {useNewUrlParser: true, useUnifiedTopology: true}
 );
 
+// Schema for links.
 const linkSchema = mongoose.Schema({
 	link: String,
 	visits: Number
 });
 
+// Mongoose model
 const Link = mongoose.model(
 	"link",
 	linkSchema
 );
 
-// Server initialization
 import Koa from 'koa';
 import Router from '@koa/router';
 
-// Classes
+// Creation of server components
 const app = new Koa();
 const router = new Router();
 
-import serve from 'koa-static';
+// Quick and easy way to serve static files
+import serve from 'koa-static'; // NOTE: named 'serve' because 'static' is forbidden in strict mode.
+
+// Used to parse ctx.request.body
 import body from 'koa-body';
 
-router.get('/', serve("./public"))
+// Landing page, serves "public" folder
+router.get('/', serve("public"))
 
+// Post to '/' to make a new short link
 router.post('/', body(), async (ctx, next) => {
 	let newLink = await new Link({
+		// Take link from request body
 		link: ctx.request.body.link,
 		visits: 0
 	});
 
+	// Save link to database
 	newLink.save();
 
+	// Change response status
 	ctx.response.status = 200;
+
+	// Not very clean, but saves me some additional work.
+	// Serves response page with the shortened link ID
 	ctx.response.body = `
 	<!DOCTYPE html>
 	<html lang="en">
@@ -111,8 +91,8 @@ router.post('/', body(), async (ctx, next) => {
 	next()
 });
 
-// Tried to statically serve ./error, but it was returning a "not found" for some reason. :(
-router.get("/error", (ctx) => ctx.response.body = errorPage)
+// Error page. If any function fails, you will be directed here.
+router.get("/error", serve("."))
 
 router.get("/visits/:id", async (ctx, next) => {
 	try {
@@ -129,30 +109,21 @@ router.get("/visits/:id", async (ctx, next) => {
 router.get("/short/:id", async (ctx, next) => {
 	try {
 		let link = await Link.findById(ctx.params.id);
+
+		// Update visit count
 		link.visits += 1;
+
+		// Redirect user to link
 		ctx.response.redirect(link.link)
+
+		// Update link's information
 		link.save();
+
 	} catch(err) {
 		console.log(err)
+		
 		ctx.response.redirect("/error")
 	}
-	/*
-	if(link != undefined)	{
-		ctx.response.body = `
-		<html>
-			<script>
-				location.replace("${link.link}")
-			</script>
-		</html>
-		`
-		link.visits++;
-		link.update();
-		next();
-		return;
-	} else {
-		ctx.response.body = "Invalid link!"
-	}
-	*/
 	next()
 })
 
