@@ -4,11 +4,11 @@ WORKDIR /server
 
 EXPOSE 3000
 
-COPY package*.json .
+COPY package*.json ./
 
 RUN npm install
 
-COPY * .
+COPY * ./
 
 COPY ./public /server/public
 
