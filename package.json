@@ -2,7 +2,7 @@
   "name": "slinky",
   "version": "1.0.0",
   "main": "index.mjs",
-  "license": "DUH",
+  "license": "SEE LICENSE IN LICENSE.md",
   "type": "module",
   "dependencies": {
     "@koa/router": "^10.1.0",
